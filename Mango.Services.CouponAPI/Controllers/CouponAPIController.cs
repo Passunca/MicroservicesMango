@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Mango.Services.CouponAPI.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/coupon")]
     [ApiController]
     public class CouponAPIController : ControllerBase
     {
@@ -31,7 +31,7 @@ namespace Mango.Services.CouponAPI.Controllers
             }
             catch (Exception ex)
             {
-                _response.isSuccess = false;
+                _response.IsSuccess = false;
                 _response.Message = ex.Message;
             }
 
@@ -49,7 +49,7 @@ namespace Mango.Services.CouponAPI.Controllers
             }
             catch (Exception ex)
             {
-                _response.isSuccess = false;
+                _response.IsSuccess = false;
                 _response.Message = ex.Message;
             }
 
@@ -66,14 +66,14 @@ namespace Mango.Services.CouponAPI.Controllers
                 Coupon obj = _db.Coupons.First(u => u.CouponCode.ToLower() == code.ToLower());
                 if(obj is null)
                 {
-                    _response.isSuccess = false;
+                    _response.IsSuccess = false;
                 }
 
                 _response.Result = _mapper.Map<CouponDto>(obj);
             }
             catch (Exception ex)
             {
-                _response.isSuccess = false;
+                _response.IsSuccess = false;
                 _response.Message = ex.Message;
             }
 
@@ -94,7 +94,7 @@ namespace Mango.Services.CouponAPI.Controllers
             }
             catch (Exception ex)
             {
-                _response.isSuccess = false;
+                _response.IsSuccess = false;
                 _response.Message = ex.Message;
             }
 
@@ -115,7 +115,7 @@ namespace Mango.Services.CouponAPI.Controllers
             }
             catch (Exception ex)
             {
-                _response.isSuccess = false;
+                _response.IsSuccess = false;
                 _response.Message = ex.Message;
             }
 
@@ -124,6 +124,7 @@ namespace Mango.Services.CouponAPI.Controllers
 
 
         [HttpDelete]
+        [Route("{id:int}")]
         public ResponseDto Delete(int id)
         {
             try
@@ -134,7 +135,7 @@ namespace Mango.Services.CouponAPI.Controllers
             }
             catch (Exception ex)
             {
-                _response.isSuccess = false;
+                _response.IsSuccess = false;
                 _response.Message = ex.Message;
             }
 
