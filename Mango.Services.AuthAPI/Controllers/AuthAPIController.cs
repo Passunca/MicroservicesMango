@@ -56,7 +56,7 @@ namespace Mango.Services.AuthAPI.Controllers
         {
             var assignRoleSuccessful = await _authService.AssignRole(model.Email, model.Role.ToUpper());
 
-            if (assignRoleSuccessful)
+            if (!assignRoleSuccessful)
             {
                 _response.IsSuccess = false;
                 _response.Message = "Error encountered";
