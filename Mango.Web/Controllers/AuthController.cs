@@ -49,7 +49,7 @@ namespace Mango.Web.Controllers
             }
             else
             {
-                ModelState.AddModelError("CustomError", responseDto.Message);
+                TempData["error"] = responseDto.Message;
                 return View(obj);
             }
         }
@@ -91,6 +91,10 @@ namespace Mango.Web.Controllers
                 }
 
             }
+            else
+            {
+                TempData["error"] = result.Message;
+            }
 
             var roleList = new List<SelectListItem>()
             {
@@ -108,7 +112,7 @@ namespace Mango.Web.Controllers
             await HttpContext.SignOutAsync();
             _tokenProvider.ClearToken();
 
-            return RedirectToAction("Index","Home");
+            return RedirectToAction("Index", "Home");
         }
 
         private async Task SignInUser(LoginResponseDto model)
