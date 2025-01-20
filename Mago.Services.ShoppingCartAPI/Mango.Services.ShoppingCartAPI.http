@@ -1,0 +1,6 @@
+@Mago.Services.ShoppingCartAPI_HostAddress = http://localhost:5287
+
+GET {{Mago.Services.ShoppingCartAPI_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
