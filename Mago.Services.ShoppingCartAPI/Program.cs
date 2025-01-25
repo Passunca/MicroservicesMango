@@ -1,4 +1,5 @@
 using AutoMapper;
+using Mango.MessageBus;
 using Mango.Services.ShoppingCartAPI;
 using Mango.Services.ShoppingCartAPI.Data;
 using Mango.Services.ShoppingCartAPI.Extensions;
@@ -33,6 +34,8 @@ builder.Services.AddScoped<ICouponService, CouponService>();
 builder.Services.AddHttpClient("Coupon",
     u => u.BaseAddress = new Uri(builder.Configuration["ServiceUrls:CouponAPI"]))
           .AddHttpMessageHandler<BackendApiAuthenticationHttpClientHandler>();
+
+builder.Services.AddScoped<IMessageBus, MessageBus>();
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
