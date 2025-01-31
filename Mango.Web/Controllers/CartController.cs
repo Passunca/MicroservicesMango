@@ -1,5 +1,6 @@
 ﻿using Mango.Web.Models;
 using Mango.Web.Service.IService;
+using Mango.Web.Utility;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
@@ -39,11 +40,11 @@ namespace Mango.Web.Controllers
             cart.CartHeader.Phone = cartDto.CartHeader.Phone;
             cart.CartHeader.Email = cartDto.CartHeader.Email;
             cart.CartHeader.Name = cartDto.CartHeader.Name;
-        
+
             var response = await _orderService.CreateOrder(cart);
             OrderHeaderDto orderHeaderDto = JsonConvert.DeserializeObject<OrderHeaderDto>(Convert.ToString(response.Result));
 
-            if(response != null && response.IsSuccess)
+            if (response != null && response.IsSuccess)
             {
                 //get stripe sesions and redirect to stripe
 
@@ -70,7 +71,21 @@ namespace Mango.Web.Controllers
         [Authorize]
         public async Task<IActionResult> Confirmation(int orderId)
         {
-            return View(orderId);
+            ResponseDto? response = await _orderService.ValidateStripeSession(orderId);
+
+            if (response != null && response.IsSuccess)
+            {
+
+                OrderHeaderDto orderHeader = JsonConvert.DeserializeObject<OrderHeaderDto>(Convert.ToString(response.Result));
+
+                if (orderHeader.Status == StaticDetails.Status_Approved)
+                {
+                    return View(orderId);
+                }
+
+            }
+            //redirect to page based on status
+            return RedirectToAction(nameof(CartIndex));
         }
 
         private async Task<CartDto> LoadCartDtoBasedOnLoggedinUser()
