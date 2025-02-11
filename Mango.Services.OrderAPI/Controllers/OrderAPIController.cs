@@ -1,13 +1,12 @@
 ﻿using AutoMapper;
+using Mango.MessageBus;
 using Mango.Services.OrderAPI.Data;
 using Mango.Services.OrderAPI.Models;
 using Mango.Services.OrderAPI.Models.Dto;
 using Mango.Services.OrderAPI.Service.IService;
 using Mango.Services.OrderAPI.Utility;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Options;
 using Stripe;
 using Stripe.Checkout;
 
@@ -22,12 +21,17 @@ namespace Mango.Services.OrderAPI.Controllers
         private readonly ResponseDto _response;
         private readonly AppDbContext _db;
 
+        private readonly IMessageBus _messageBus;
+        private readonly IConfiguration _configuration;
 
-        public OrderAPIController(AppDbContext db, IMapper mapper, IProductService productService)
+
+        public OrderAPIController(AppDbContext db, IMapper mapper, IProductService productService, IMessageBus messageBus, IConfiguration configuration)
         {
             _db = db;
             _mapper = mapper;
             _productService = productService;
+            _messageBus = messageBus;
+            _configuration = configuration;
             _response = new ResponseDto();
         }
 
@@ -56,6 +60,7 @@ namespace Mango.Services.OrderAPI.Controllers
 
             return _response;
         }
+
         [Authorize]
         [HttpPost("CreateStripeSession")]
         public async Task<ResponseDto> CreateStripeSession([FromBody] StripeRequestDto stripeRequestDto)
@@ -143,6 +148,17 @@ namespace Mango.Services.OrderAPI.Controllers
                     orderHeader.PaymentIntentId = paymentIntent.Id;
                     orderHeader.Status = StaticDetails.Status_Completed;
                     await _db.SaveChangesAsync();
+
+                    RewardDto rewarddto = new()
+                    {
+                        OrderId = orderHeader.OrderHeaderId,
+                        RewardsActivity = Convert.ToInt32(orderHeader.OrderTotal),
+                        UserId = orderHeader.UserId,
+                    };
+
+                    string topicName = _configuration.GetValue<string>("TopicAndQueueNames:OrderCreatedTopic");
+                    await _messageBus.PublishMessage(rewarddto, topicName);
+
                     _response.Result = _mapper.Map<OrderHeaderDto>(orderHeader);
                 }
             }
