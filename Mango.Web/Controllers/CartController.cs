@@ -75,14 +75,12 @@ namespace Mango.Web.Controllers
 
             if (response != null && response.IsSuccess)
             {
-
                 OrderHeaderDto orderHeader = JsonConvert.DeserializeObject<OrderHeaderDto>(Convert.ToString(response.Result));
 
                 if (orderHeader.Status == StaticDetails.Status_Approved)
                 {
                     return View(orderId);
                 }
-
             }
             //redirect to page based on status
             return RedirectToAction(nameof(CartIndex));
@@ -102,6 +100,7 @@ namespace Mango.Web.Controllers
             return new CartDto();
         }
 
+        [HttpPost]
         public async Task<IActionResult> Remove(int cartDetailsId)
         {
             var userId = User.Claims.Where(u => u.Type == JwtRegisteredClaimNames.Sub)?.FirstOrDefault()?.Value;
